@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Labor Conecta</string>
+    <string name="login">Login</string>
+    <string name="username">Username</string>
+    <string name="senha">Senha</string>
+    <string name="login">Login</string>
+    <string name="registrar">Registrar</string>
+</resources>
