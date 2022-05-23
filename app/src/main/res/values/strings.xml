@@ -1,8 +1,10 @@
 <resources>
     <string name="app_name">Labor Conecta</string>
-    <string name="login">Login</string>
-    <string name="username">Username</string>
+    <string name="login">Entrar</string>
+    <string name="username">E-mail</string>
+    <string name="fullname">Nome Completo</string>
     <string name="senha">Senha</string>
+<<<<<<< HEAD
     <string name="login">Login</string>
     <string name="registrar">Registrar</string>
     <string name="novo_an_ncio">Novo Anúncio</string>
@@ -13,4 +15,14 @@
     <string name="anunciar">Anunciar</string>
     <string name="nameRecycler">Name</string>
     <string name="string_namerecycler">NameRecycler</string>
+=======
+    <string name="registrar">Ainda não possui uma conta? Criar conta</string>
+    <string name="registrar_curto">Criar conta</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="nav_services">Serviços</string>
+    <string name="nav_my_services">Meus Serviços</string>
+    <string name="nav_profile">Perfil</string>
+>>>>>>> 6a3ec63b131d71d28185077a28094a7bfb32036e
 </resources>
