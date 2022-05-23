@@ -3,8 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/RMAAR/AndroidStudioProjects/LaborConecta/app/src/main/res/layout/activity_anuncio.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/RMAAR/AndroidStudioProjects/LaborConecta/app/src/main/res/layout/activity_main.xml" value="0.20416666666666666" />
-        <entry key="..\:/Users/RMAAR/AndroidStudioProjects/LaborConecta/app/src/main/res/layout/activity_menu.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/RMAAR/AndroidStudioProjects/LaborConecta/app/src/main/res/layout/activity_menu.xml" value="0.18" />
+        <entry key="..\:/Users/RMAAR/AndroidStudioProjects/LaborConecta/app/src/main/res/layout/activity_novo_anuncio.xml" value="0.25" />
+        <entry key="..\:/Users/RMAAR/AndroidStudioProjects/LaborConecta/app/src/main/res/layout/anuncio_recycle_view.xml" value="0.20416666666666666" />
       </map>
     </option>
   </component>

@@ -5,4 +5,12 @@
     <string name="senha">Senha</string>
     <string name="login">Login</string>
     <string name="registrar">Registrar</string>
+    <string name="novo_an_ncio">Novo Anúncio</string>
+    <string name="nome_novo_anuncio">Nome</string>
+    <string name="telefone_novo_anuncio">Telefone</string>
+    <string name="ramo_da_atividade">Ramo da atividade</string>
+    <string name="insira_seu_an_ncio">Insira seu anúncio</string>
+    <string name="anunciar">Anunciar</string>
+    <string name="nameRecycler">Name</string>
+    <string name="string_namerecycler">NameRecycler</string>
 </resources>

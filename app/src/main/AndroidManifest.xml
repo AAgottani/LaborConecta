@@ -10,6 +10,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.LaborConecta">
         <activity
+            android:name=".NovoAnuncioActivity"
+            android:exported="false" />
+        <activity
+            android:name=".AnuncioActivity"
+            android:exported="false" />
+        <activity
             android:name=".MenuActivity"
             android:exported="false" />
         <activity
