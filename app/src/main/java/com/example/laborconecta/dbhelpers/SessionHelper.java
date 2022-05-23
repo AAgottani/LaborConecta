@@ -1,7 +1,7 @@
 package com.example.laborconecta.dbhelpers;
 
-import static com.example.laborconecta.contracts.UserContract.SQL_CREATE_ENTRIES;
-import static com.example.laborconecta.contracts.UserContract.SQL_DELETE_ENTRIES;
+import static com.example.laborconecta.contracts.SessionContract.SQL_CREATE_ENTRIES;
+import static com.example.laborconecta.contracts.SessionContract.SQL_DELETE_ENTRIES;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,24 +9,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import android.util.Log;
 
+import com.example.laborconecta.contracts.SessionContract;
 import com.example.laborconecta.contracts.UserContract;
+import com.example.laborconecta.repositories.UserRepository;
 
 import org.jetbrains.annotations.Nullable;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-
-public class UserHelper extends SQLiteOpenHelper {
+public class SessionHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Users.db";
+    public static final String DATABASE_NAME = "Sessions.db";
 
-    public UserHelper(Context context) {
+    private final Context context;
+
+    public SessionHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        this.context = context;
     }
 
     public void onCreate(SQLiteDatabase db) {
@@ -35,45 +36,33 @@ public class UserHelper extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // This database is only a cache for online data, so its upgrade policy is
         // to simply to discard the data and start over
-         db.execSQL(SQL_DELETE_ENTRIES);
+        db.execSQL(SQL_DELETE_ENTRIES);
         onCreate(db);
     }
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
     }
 
-    public boolean exists(String email, @Nullable String password) {
+    public @Nullable UserContract.UserModel getSession() {
         SQLiteDatabase db = getReadableDatabase();
 
         // Define a projection that specifies which columns from the database
         // you will actually use after this query.
         String[] projection = {
                 BaseColumns._ID,
-                UserContract.User.C_NAME,
-                UserContract.User.C_EMAIL
+                SessionContract.Session.C_UID,
         };
 
-        // Filter results WHERE "email" = email and "password" = md5(password)
-        String selection = UserContract.User.C_EMAIL + " = ?";
-        ArrayList<String> selectionArgs = new ArrayList<>();
-        selectionArgs.add(email);
-
-        if (password != null) {
-            selection += " AND " + UserContract.User.C_PASSWORD + " = ?";
-            selectionArgs.add(md5(password));
-        }
-
-        Log.d("USER_HELPER", String.join(", ", selectionArgs));
+        String selection = SessionContract.Session.C_ACTIVE + " = 1";
 
         // How you want the results sorted in the resulting Cursor
-        String sortOrder =
-                UserContract.User.C_EMAIL + " ASC";
+        String sortOrder = BaseColumns._ID + " DESC";
 
         Cursor cursor = db.query(
-                UserContract.User.TABLE_NAME, // The table to query
+                SessionContract.Session.TABLE_NAME, // The table to query
                 projection, // The array of columns to return (pass null to get all)
                 selection, // The columns for the WHERE clause
-                selectionArgs.toArray(new String[0]), // The values for the WHERE clause
+                null, // The values for the WHERE clause
                 null, // don't group the rows
                 null, // don't filter by row groups
                 sortOrder // The sort order
@@ -81,52 +70,53 @@ public class UserHelper extends SQLiteOpenHelper {
 
         cursor.moveToFirst();
 
-        int count = cursor.getCount();
-        cursor.close();
+        try {
 
-        return count == 1;
+            if (cursor.getCount() == 0) {
+                return null;
+            }
+
+            int uid = cursor.getInt(
+                    cursor.getColumnIndexOrThrow(SessionContract.Session.C_UID)
+            );
+
+            return (new UserHelper(context)).getUser(uid);
+
+        } finally {
+            cursor.close();
+        }
     }
-
-    public boolean doLogin(String email, String password) {
-        return exists(email, password);
-    }
-
-    public boolean doRegister(String name, String email, String password) {
-        SQLiteDatabase db = getWritableDatabase();
+    public void createSession(int uid) {
+        // Gets the data repository in write mode
+        SQLiteDatabase db = this.getWritableDatabase();
 
         // Create a new map of values, where column names are the keys
         ContentValues values = new ContentValues();
-        values.put(UserContract.User.C_NAME, name);
-        values.put(UserContract.User.C_EMAIL, email);
-        values.put(UserContract.User.C_PASSWORD, md5(password));
+        values.put(SessionContract.Session.C_UID, uid);
+        values.put(SessionContract.Session.C_ACTIVE, true);
 
         // Insert the new row, returning the primary key value of the new row
-        long newRowId = db.insert(UserContract.User.TABLE_NAME, null, values);
+        db.insert(SessionContract.Session.TABLE_NAME, null, values);
 
-        return newRowId > 0;
+        // Atualiza o usuário
+        UserRepository.getInstance(this.context).setUser(this.getSession());
     }
+    public void invalidate(int uid) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
-    private String md5(final String s) {
-        final String MD5 = "MD5";
-        try {
-            // Create MD5 Hash
-            MessageDigest digest = java.security.MessageDigest
-                    .getInstance(MD5);
-            digest.update(s.getBytes());
-            byte[] messageDigest = digest.digest();
+        // New value for one column
+        ContentValues values = new ContentValues();
+        values.put(SessionContract.Session.C_ACTIVE, "0");
 
-            // Create Hex String
-            StringBuilder hexString = new StringBuilder();
-            for (byte aMessageDigest : messageDigest) {
-                StringBuilder h = new StringBuilder(Integer.toHexString(0xFF & aMessageDigest));
-                while (h.length() < 2)
-                    h.insert(0, "0");
-                hexString.append(h);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return "";
+        // Which row to update, based on the title
+        String selection = SessionContract.Session.C_UID + " = ?";
+        String[] selectionArgs = { Integer.toString(uid) };
+
+        db.update(
+                SessionContract.Session.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs
+        );
     }
 }
