@@ -38,6 +38,8 @@ public class NovoAnuncioActivity extends AppCompatActivity {
                 intent.putExtra("telefone", telefone_usuario);
                 intent.putExtra("ramo", ramo_atividade);
                 intent.putExtra("corpo", corpo);
+                AnuncioActivity anuncio= new AnuncioActivity();
+                anuncio.addNovoAnuncioOnClick(view);
                 startActivity(intent);
             }
         });
